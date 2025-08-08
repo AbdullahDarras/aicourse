@@ -8,17 +8,18 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(cuid())
+  id             String             @id @default(cuid())
   name           String?
-  email          String?  @unique
+  email          String?            @unique
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
   accounts       Account[]
   sessions       Session[]
   enrollments    Enrollment[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  checkoutSessions CheckoutSession[] @relation("UserCheckoutSessions")
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 }
 
 model Account {
@@ -60,15 +61,16 @@ model VerificationToken {
 }
 
 model Course {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  description String
-  priceCents  Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  lessons     Lesson[]
-  enrollments Enrollment[]
+  id               String             @id @default(cuid())
+  title            String
+  slug             String             @unique
+  description      String
+  priceCents       Int
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  lessons          Lesson[]
+  enrollments      Enrollment[]
+  checkoutSessions CheckoutSession[]  @relation("CourseCheckoutSessions")
 }
 
 model Lesson {
@@ -94,13 +96,14 @@ model Enrollment {
 }
 
 model CheckoutSession {
-  id       String   @id @default(cuid())
-  stripeId String   @unique
-  userId   String
-  courseId String
-  status   String
+  id        String   @id @default(cuid())
+  stripeId  String   @unique
+  userId    String
+  courseId  String
+  status    String   // open | complete | expired
   createdAt DateTime @default(now())
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  // علاقات مُسمّاة + onDelete واضح
+  user   User   @relation("UserCheckoutSessions",   fields: [userId],   references: [id], onDelete: Cascade)
+  course Course @relation("CourseCheckoutSessions", fields: [courseId], references: [id], onDelete: Cascade)
 }
