@@ -1,40 +1,39 @@
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String   @id @default(cuid())
-  name          String?
-  email         String?  @unique
-  emailVerified DateTime?
-  image         String?
+  id             String   @id @default(cuid())
+  name           String?
+  email          String?  @unique
+  emailVerified  DateTime?
+  image          String?
   hashedPassword String?
-  accounts      Account[]
-  sessions      Session[]
-  enrollments   Enrollment[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  enrollments    Enrollment[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
   oauth_token_secret String?
   oauth_token        String?
 
@@ -65,7 +64,7 @@ model Course {
   title       String
   slug        String   @unique
   description String
-  priceCents  Int      // price in cents
+  priceCents  Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   lessons     Lesson[]
@@ -73,12 +72,13 @@ model Course {
 }
 
 model Lesson {
-  id        String   @id @default(cuid())
-  courseId  String
-  title     String
-  content   String   // could be markdown or URL to video
-  order     Int
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id       String   @id @default(cuid())
+  courseId String
+  title    String
+  content  String
+  order    Int
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 model Enrollment {
@@ -86,19 +86,21 @@ model Enrollment {
   userId    String
   courseId  String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
 }
 
 model CheckoutSession {
-  id           String   @id @default(cuid())
-  stripeId     String   @unique
-  userId       String
-  courseId     String
-  status       String   // open | complete | expired
-  createdAt    DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course       Course   @relation(fields: [courseId], references: [id], referencesOnDelete: Cascade)
+  id       String   @id @default(cuid())
+  stripeId String   @unique
+  userId   String
+  courseId String
+  status   String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
