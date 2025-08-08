@@ -1,0 +1,21 @@
+
+services:
+  - type: web
+    name: ai-courses-saas
+    env: node
+    plan: free
+    buildCommand: "npm install && npx prisma generate && npm run build"
+    startCommand: "npx prisma migrate deploy && npm start"
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NEXTAUTH_URL
+        value: https://ai-courses-saas.onrender.com
+      - key: NEXTAUTH_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
